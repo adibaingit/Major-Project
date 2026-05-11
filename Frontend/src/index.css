@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Baloo+Bhai+2:wght@400..800&family=Balthazar&family=Work+Sans:ital,wght@0,100..900;1,100..900&family=Zain&display=swap');
+
+@theme {
+  /* Fonts */
+  --font-balthazar: "Balthazar", serif;
+  --font-outfit: "Outfit", sans-serif;
+
+  /* Primary: Deep Navy Blue - rgb(1, 31, 75) */
+  --color-primary: oklch(0.24 0.05 256.0);
+  /* Hover: A slightly lighter, more vibrant blue */
+  --color-primaryHover: oklch(0.32 0.06 256.0);
+
+  --color-secondary: oklch(0.78 0.14 85.0);
+  /* --color-secondary: oklch(0.743 0.152 72.73); */
+  /* Hover: A lighter, softer sun-yellow */
+  --color-secondaryHover: oklch(0.89 0.10 92.0);
+
+  /* Functional Colors */
+  --color-textBlack: oklch(0.15 0 0);
+  --color-textWhite: oklch(0.98 0.005 90);
+  
+  --color-bgWhite: oklch(1 0 0);
+  --color-bgSoft: oklch(0.97 0.01 256.0); /* Very light blue tint for sections */
+
+  /* Accents (Keeping your logic but adjusting for the new palette) */
+  --color-accentTeal: oklch(0.65 0.11 195);
+  --color-accentWine: oklch(0.45 0.15 25);
+}
