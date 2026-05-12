@@ -16,14 +16,14 @@ async function register(req, res) {
 
   if (isUserExists) {
     return res.status(401).json({
-      message: "user already exists",
+      message: "user already exists, Login to continue",
     });
   }
 
   //insert hash password
   const hashPassword=await bcrypt.hash(password,10) //10 is salt
 
-  const user = userModel.create({
+  const user =await userModel.create({
     username,
     email,
     password:hashPassword,
@@ -93,12 +93,13 @@ async function googleCallback(req,res,next) {
   passport.authenticate('google', { session: false},(err, user, info) => {
         if (err) {
             console.error("Passport Auth Error:", err);
-            return res.redirect('http://localhost:5000/api/auth/login?error=server_error');
+            console.log("passport err")
+            return res.redirect('http://localhost:5173/?error=server_error');
         }
 
         if (!user) {
             console.log("No user found/created");
-            return res.redirect('http://localhost:5000/api/auth/login?error=no_user');
+            return res.redirect('http://localhost:5173/?error=no_user');
         }
 
         try {

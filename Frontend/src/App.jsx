@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import PreferencesForm from "./pages/PreferencesForm"
 import LoginSuccess from "./pages/LoginSuccess";
+import Profile from "./pages/Profile";
 import { useState } from "react";
 
 function App() {
@@ -21,11 +22,13 @@ function App() {
           <Route path="/" element={<Home />}/>
           <Route path="/plan" element={<PreferencesForm />} />
           <Route path="/login-success" element={<LoginSuccess />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
       <Toaster position="top-center" reverseOrder={false} />
       {showLogin && (
-        <Login onClose={() => setShowLogin(false)} />
+        <Login onClose={() => setShowLogin(false)}
+        onSwitchToSignup={() => { setShowSignup(true); setShowLogin(false); }} />
       )}
       {showSignup && (
         <Signup 

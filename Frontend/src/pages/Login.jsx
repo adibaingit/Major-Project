@@ -3,9 +3,10 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { Mail, Lock, X } from "lucide-react";
 
-const Login = ({ onClose }) => {
+const Login = ({ onClose , onSwitchToSignup }) => {
   // 1. State for form inputs
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -37,28 +38,22 @@ const Login = ({ onClose }) => {
         localStorage.setItem("token", response.data.token);
         // Success Toast!
         toast.success(`Welcome back, ${response.data.user.username}!`, {
-          id: loadingToast, // Replaces the loading toast
+          duration: 2000,
           style: {
-            border: "1px solid #E8B931", // Your Golden color
+            border: "1px solid #E8B931",
             padding: "16px",
-            color: "#001F3F", // Your Navy color
-          },
-          iconTheme: {
-            primary: "#E8B931",
-            secondary: "#FFFAEE",
+            color: "#001F3F",
           },
         });
-
-        onClose();
-        setTimeout(() => window.location.href="/", 1500);
+        setTimeout(() => {
+          onClose();
+          window.location.href = "/";
+        }, 1500);
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Login failed", {
-      id: loadingToast, // Replaces the loading toast
-    });
-    } finally{
-      setLoading(false);
+      toast.error(err.response?.data?.message || "Login failed", {});
     }
+    setLoading(false);
   };
 
   return (
@@ -68,7 +63,7 @@ const Login = ({ onClose }) => {
         onClick={onClose}
       ></div>
 
-      <div className="relative w-full max-w-6xl h-150 bg-white rounded-3xl shadow-2xl flex overflow-hidden group z-10">
+      <div className="relative w-full max-w-5xl h-400px bg-white rounded-2xl shadow-2xl flex overflow-hidden group z-10">
         <button
           onClick={onClose}
           className="absolute top-6 right-6 z-50 p-2 rounded-full text-primary hover:bg-secondary/20 transition-all active:scale-95"
@@ -93,7 +88,7 @@ const Login = ({ onClose }) => {
         </div>
 
         {/* RIGHT SIDE FORM */}
-        <div className="w-full md:w-1/2 flex flex-col justify-center p-12 md:p-16">
+        <div className="w-full md:w-1/2 flex flex-col justify-center p-8 md:p-12">
           <h2 className="text-4xl font-semibold text-primary mb-3">
             Welcome Back
           </h2>
@@ -159,7 +154,7 @@ const Login = ({ onClose }) => {
             </button>
           </form>
 
-          <div className="relative my-8">
+          {/* <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-200"></div>
             </div>
@@ -168,12 +163,12 @@ const Login = ({ onClose }) => {
                 Or
               </span>
             </div>
-          </div>
+          </div> */}
 
           <button
             type="button"
             onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 border border-gray-200 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest text-primary hover:bg-gray-50 transition-all active:scale-95 shadow-sm"
+            className="w-full flex items-center justify-center gap-3 mt-4 border border-gray-200 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest text-primary hover:bg-gray-50 transition-all active:scale-95 shadow-sm"
           >
             <img
               src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
@@ -185,7 +180,9 @@ const Login = ({ onClose }) => {
 
           <div className="mt-8 text-center text-sm text-gray-500">
             Don't have an account?{" "}
-            <button className="font-bold text-secondary hover:underline">
+            <button 
+            className="font-bold text-secondary hover:underline"
+            onClick={onSwitchToSignup}>
               Sign up for free
             </button>
           </div>

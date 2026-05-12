@@ -6,6 +6,9 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  profile:{
+    type:String,
+  },
 
   email: {
     type: String,
@@ -29,8 +32,8 @@ const userSchema = new mongoose.Schema({
 
   touristType: {
     type: String,
-    enum: ["domestic", "nri", "foreign"],
-    default: "domestic",
+    enum: ["solo", "couple", "family","luxury","budget"],
+    default: "solo",
   },
 
   savedPlans: [

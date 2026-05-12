@@ -21,11 +21,13 @@ passport.use(new GoogleStrategy({
                 googleId: profile.id,
                 username: profile.displayName,
                 email: profile.emails[0].value,
+                profile:profile.photos[0]?.value,
             });
             return done(null, user); // Success!
         }
     } catch (err) {
         console.error("Error in Google Strategy:", err);
+        console.log("error in google strategy",err);
         return done(err, null); // Error!
     }
 }));

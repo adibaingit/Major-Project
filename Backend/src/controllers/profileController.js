@@ -6,6 +6,7 @@ async function profile(req,res) {
     try {
         const user=await userModel.findById(decode.id).select('-password');
         return res.status(200).json({
+        success:true,
         message:"User Profile",
         user
     })
@@ -21,6 +22,7 @@ async function deleteAccount(req,res) {
     await userModel.findByIdAndDelete(user.id);
     res.clearCookie("token");
     return res.status(200).json({
+        success:true,
         message:"Account deleted Sucessfully"
     })
 
