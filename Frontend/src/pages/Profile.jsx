@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { User, MapPin, Compass, ShieldCheck, Mail } from "lucide-react";
 import toast from "react-hot-toast";
+import MyTrips from "./MyTrips";
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
@@ -22,7 +23,7 @@ const Profile = () => {
 
         setUserData(res.data.user);
         toast.success("Profile loaded successfully");
-        console.log("Profile data:", userData);
+        // console.log("Profile data:", userData);
       } catch (err) {
         toast.error("Failed to load profile");
       } finally {
@@ -82,54 +83,7 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Stats / Quick Info */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-50 text-center">
-            <h3 className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">
-              Total Trips
-            </h3>
-            <p className="text-2xl font-bold text-primary">0</p>
-          </div>
-          <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-50 text-center">
-            <h3 className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">
-              Planned Days
-            </h3>
-            <p className="text-2xl font-bold text-primary">0</p>
-          </div>
-          <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-50 text-center">
-            <h3 className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">
-              Destinations
-            </h3>
-            <p className="text-2xl font-bold text-primary">0</p>
-          </div>
-        </div>
-
-        {/* Placeholder for My Trips */}
-        <div className="mt-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-primary font-balthazar">
-              Your Saved Itineraries
-            </h2>
-            <button className="text-secondary font-bold text-sm hover:underline">
-              View All
-            </button>
-          </div>
-
-          <div className="bg-white/50 border-2 border-dashed border-gray-200 rounded-3xl p-12 text-center">
-            <div className="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MapPin className="text-gray-400" />
-            </div>
-            <p className="text-gray-500 font-medium">
-              No trips generated yet. Let's start exploring!
-            </p>
-            <button
-              onClick={() => (window.location.href = "/plan")}
-              className="mt-4 bg-primary text-white px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-black transition-all shadow-lg"
-            >
-              Plan a New Trip
-            </button>
-          </div>
-        </div>
+        <MyTrips />
       </div>
     </div>
   );

@@ -42,7 +42,7 @@ const Home = () => {
         </div>
 
         {/* Center Content */}
-        <div className="relative z-10 px-6 max-w-5xl flex flex-col items-center">
+        <div className="relative z-10 px-6 max-w-5xl flex flex-col items-center justify-center">
           
           {/* Main Title */}
           <h1 className="font-balthazar text-white text-center text-5xl md:text-6xl mb-6 animate-fadeInUp tracking-tight">

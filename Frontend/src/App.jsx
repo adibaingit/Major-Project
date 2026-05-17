@@ -7,6 +7,9 @@ import Signup from "./pages/Signup";
 import PreferencesForm from "./pages/PreferencesForm"
 import LoginSuccess from "./pages/LoginSuccess";
 import Profile from "./pages/Profile";
+import CityDetails from "./pages/CityDetails";
+import Itinerary from "./pages/Itinerary";
+import MyTrips from "./pages/MyTrips";
 import { useState } from "react";
 
 function App() {
@@ -23,6 +26,9 @@ function App() {
           <Route path="/plan" element={<PreferencesForm />} />
           <Route path="/login-success" element={<LoginSuccess />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/city/:cityName" element={<CityDetails />} />
+          <Route path="/itinerary/:tripId" element={<Itinerary />} />
+          <Route path="/my-trips" element={<MyTrips />} />
         </Routes>
       </div>
       <Toaster position="top-center" reverseOrder={false} />
