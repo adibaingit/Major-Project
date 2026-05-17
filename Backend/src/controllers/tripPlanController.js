@@ -6,35 +6,84 @@ const {fetchFoursquarePlaces} = require("../services/placesService");
 const { generateItinerary } = require("../services/geminiService");
 const { buildPrompt, buildGeminiSchema } = require("../utils/promptBuilder");
 
-const userModel=require('../models/user')
+const userModel=require('../models/user');
+const tripPlanModel = require('../models/tripPlan');
 
 // ─────────────────────────────────────────────
 // Builds arrivalJourney only when startCity
 // is provided — skipped entirely otherwise
 // ─────────────────────────────────────────────
-const buildArrivalJourney = (startCity, destinationCity, transportTips,groupSize) => {
+const buildArrivalJourney = (startCity, destinationCity, groupSize, budgetCategory = "avg") => {
   if (!startCity) return null;
 
   const sc = startCity.toLowerCase();
-  const flightCities = ["mumbai", "bangalore", "kolkata", "chennai", "hyderabad", "delhi"];
+  const dc = destinationCity.toLowerCase();
+  
+  // 1. Define Tier-1 Cities with Major Airports
+  const majorAirports = ["mumbai", "bangalore", "kolkata", "chennai", "hyderabad", "delhi", "pune", "ahmedabad"];
+  
+  // 2. Determine Travel Mode based on Budget + Availability
+  let mode = "train";
+  let costPerPerson = 600; // Default Base (Sleeper/3AC)
 
-  if (flightCities.includes(sc)) {
-    return {
-      from: startCity,
-      to: destinationCity,
-      mode: "flight",
-      detail: `Fly from ${startCity} to the nearest airport. ${transportTips?.airport || ""}`,
-      estimatedCost: 4500* (groupSize || 1),
-    };
+  const hasFlightOption = majorAirports.includes(sc) && majorAirports.includes(dc);
+
+  if (budgetCategory === "luxury") {
+    // Luxury always prefers Flight if available, or Premium Train (1AC/Tejas)
+    if (hasFlightOption) {
+      mode = "flight";
+      costPerPerson = 5500;
+    } else {
+      mode = "premium train";
+      costPerPerson = 2500; // 1AC / Executive Class
+    }
+  } else if (budgetCategory === "avg") {
+    // Average prefers Flight only if it's a major route, otherwise 3AC/2AC Train
+    if (hasFlightOption) {
+      mode = "flight";
+      costPerPerson = 4000;
+    } else {
+      mode = "train";
+      costPerPerson = 1500; // 2AC/3AC
+    }
+  } else {
+    // Low Budget always prefers Train (Sleeper)
+    mode = "train";
+    costPerPerson = 700;
   }
+
+  // 3. Construct the Details String
+  const detailPrefix = mode === "flight" 
+    ? `Fly from ${startCity} to the nearest airport.` 
+    : `Board a ${mode} from ${startCity} to ${destinationCity}.`;
 
   return {
     from: startCity,
     to: destinationCity,
-    mode: "train",
-    detail: `Board a train from ${startCity} to ${destinationCity}. ${transportTips?.railwayStation || ""}`,
-    estimatedCost: 600,
+    mode: mode,
+    // detail: `${detailPrefix} ${transport?.[mode === "flight" ? 'airport' : 'railwayStation'] || ""}`,
+    estimatedCost: costPerPerson * (groupSize || 1),
   };
+};
+
+//budget calculation
+const calculateRealBudget = (category, days, groupSize, travelCost = 0) => {
+  const rates = {
+    "low": 1500,
+    "avg": 3000,
+    "luxury": 10000
+  };
+
+  const baseDailyCost = rates[category.toLowerCase()] || 4000;
+  
+  // Total logic: (Rate * People * Days)
+  const totalTripBudget = (baseDailyCost * groupSize * days);
+  
+  // We subtract the journey cost (flight/train) to see 
+  // how much is actually left for the "In-City" experience
+  // const availableInCityBudget = totalTripBudget - travelCost;
+
+  return totalTripBudget;
 };
 
 // ─────────────────────────────────────────────
@@ -51,17 +100,19 @@ const generateTrip = async (req, res) => {
       interests,
       dietary,
       startCity, // optional
+      healthConsiderations,
     } = req.body;
 
+    console.log(startCity+destinationCityId + startDate+endDate+budget)
     const userId = req.user.id;
     const user=await userModel.findById(userId);
-    const touristType = user.touristType || "domestic";
+    const touristType = user.touristType || "solo";
 
     // ── Validation ────────────────────────────
     if (!destinationCityId || !startDate || !endDate || !budget) {
       return res.status(400).json({
         success: false,
-        message: "destinationCityId, startDate, endDate, and budget are required.",
+        message: "destinationCity, startDate, endDate, and budget are required.",
       });
     }
 
@@ -79,6 +130,7 @@ const generateTrip = async (req, res) => {
     }
 
     const travelMonth = start.toLocaleString("default", { month: "long" }); // e.g. "October"
+  
 
     // ════════════════════════════════════════════
     // PHASE 1 — DATA GATHERING
@@ -103,7 +155,7 @@ const generateTrip = async (req, res) => {
   fetchFoursquarePlaces(
     city.coordinates, 
     interests, // Pass the array: ["Adventure", "Culture", etc.]
-    5        
+    9        
   ),
 
   // 2. Fetch Restaurants based on Dietary preference
@@ -112,10 +164,19 @@ const generateTrip = async (req, res) => {
   fetchFoursquarePlaces(
     city.coordinates, 
     ["Food & Craft"], 
-    5, 
+    12, 
     dietary    // Pass dietary here so the service can filter for 'veg'
   ),
 ]);
+  
+  //new budget after excluding arrivalJourney cost
+  const arrivalJourney = buildArrivalJourney(startCity, city.name,groupSize,budget);
+  const twoCityTransportCost=arrivalJourney.estimatedCost;
+
+  const realBudget=calculateRealBudget(budget,days,groupSize,twoCityTransportCost ||0);
+  console.log(realBudget); //in city budget
+  const totalUserBudget=realBudget+twoCityTransportCost;
+
 
 //console.log(attractions);
 
@@ -130,16 +191,17 @@ const generateTrip = async (req, res) => {
       restaurants,
       days,
       groupSize: groupSize || 1,
-      budget,
+      realBudget,
       touristType,
       interests,
       dietary,
       startDate: start.toDateString(),
       travelMonth,
+      healthConsiderations,
     });
 
-    // console.log("Generated Prompt for Gemini:\n");
-    // console.log(prompt);
+    console.log("Generated Prompt for Gemini:\n");
+    //  console.log(prompt);
     const schema = buildGeminiSchema(days);
 
     // ════════════════════════════════════════════
@@ -159,16 +221,14 @@ const generateTrip = async (req, res) => {
     // PHASE 4 — PROCESSING & STORAGE
     // ════════════════════════════════════════════
 
-    const arrivalJourney = buildArrivalJourney(startCity, city.name, city.transportTips,groupSize);
-
     const totalEstimatedCost =
-      aiResponse.totalEstimatedCost ||
-      aiResponse.itinerary.reduce((sum, d) => sum + (d.dailyCostEstimate || 0), 0);
+      aiResponse.totalEstimatedCost + twoCityTransportCost ||
+      aiResponse.itinerary.reduce((sum, d) => sum + (d.dailyCostEstimate || 0), 0)+twoCityTransportCost;
 
-    const budgetStatus = totalEstimatedCost <= budget ? "within_budget" : "over_budget";
+    const budgetStatus = totalEstimatedCost <= totalUserBudget ? "within_budget" : "over_budget";
 
     if (budgetStatus === "over_budget") {
-      console.warn(`⚠️  Trip cost ₹${totalEstimatedCost} exceeds budget ₹${budget}.`);
+      console.warn(`⚠️  Trip cost ₹${totalEstimatedCost} exceeds budget ${totalEstimatedCost}-${totalUserBudget}`);
     }
 
     const newTrip = new TripPlan({
@@ -187,6 +247,7 @@ const generateTrip = async (req, res) => {
       arrivalJourney: arrivalJourney || undefined,
       itinerary: aiResponse.itinerary,
       totalEstimatedCost,
+      healthConsiderations,
       status: "draft",
     });
 
@@ -195,9 +256,9 @@ const generateTrip = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "Trip generated successfully!",
+      tripId: newTrip._id,
       budgetStatus,
       data: {
-        tripId: newTrip._id,
         city: city.name,
         days,
         travelMonth,
@@ -218,4 +279,66 @@ const generateTrip = async (req, res) => {
   }
 };
 
-module.exports = { generateTrip };
+
+//get trips by id
+const getTripById= async(req,res)=>{
+  const id=req.params.id
+  // console.log(id)
+  try{
+    const trip=await tripPlanModel.findById(id).populate('destinationCity');
+    
+    if(!trip){
+      return res.status(400).json({
+        success:false,
+        message:"Trip not found",
+      })
+    }
+
+    return res.status(200).json({
+      success:true,
+      message:"Trip Loading...",
+      trip
+    })
+
+  }catch(err){
+    return res.status(400).json(
+      {
+        success:false,
+        message:"Something went Wrong",
+        err
+      }
+    )
+  }
+}
+
+const getAllTrips= async (req,res) => {
+  const userId=req.user.id
+  if(!userId){
+    return res.status(400).json({
+      success:false,
+      message:"Unauthrized Access"
+    })
+  }
+  try{
+    const trips=await tripPlanModel.find({user:userId}).populate('destinationCity',"name state heroImage").select("days budget")
+    if(!trips){
+      return res.status(400).json({
+        success:false,
+        message:"No Trips found"
+      })
+    }
+    res.status(200).json({
+      success:true,
+      message:"Trips found",
+      trips
+    })
+  } catch(err){
+    res.status(200).json({
+      success:false,
+      message:"Something went wrong",
+    })
+  }
+
+}
+
+module.exports = { generateTrip ,getTripById,getAllTrips};

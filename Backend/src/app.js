@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const tripRoutes=require("./routes/tripPlanRoutes");
 
 const profileRoutes=require('./routes/profileRoutes')
+const cityRoutes=require('./routes/cityRoutes')
 
 require('./config/OauthPassport'); // Initialize Passport Config
 
@@ -21,5 +22,6 @@ app.use(cookieParser())
 app.use("/api/auth",authRoutes);
 app.use("/api/profile",profileRoutes);
 app.use("/api/trips", tripRoutes);
+app.use("/api/city",cityRoutes)
 
 module.exports=app

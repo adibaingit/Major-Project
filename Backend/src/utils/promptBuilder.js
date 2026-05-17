@@ -3,7 +3,6 @@
 // ─────────────────────────────────────────────
 const buildPrompt = ({
   city,
-  startCity,
   festivals,
   attractions,
   restaurants,
@@ -15,6 +14,7 @@ const buildPrompt = ({
   dietary,
   startDate,
   travelMonth,
+  healthConsiderations,
 }) => {
   //variable defination
   const festivalText =
@@ -67,12 +67,11 @@ DESTINATION
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 City        : ${city.name}, ${city.state}
 Description : ${city.description || "A wonderful travel destination."}
-Metro       : ${city.transportTips?.metroAvailable ? "Available" : "Not Available"}
-Airport     : ${city.transportTips?.airport || "N/A"}
-Railway     : ${city.transportTips?.railwayStation || "N/A"}
-Auto Fares  : ${city.transportTips?.autoFareGuide || "N/A"}
-Prepaid Taxi: ${city.transportTips?.prepaidTaxiBooth || "N/A"}
-Discounts   : ${city.govtDiscounts?.description || "None"}
+Metro       : ${city.transport?.metroAvailable ? "Available" : "Not Available"}
+Airport     : ${city.transport?.airport || "N/A"}
+Railway     : ${city.transport?.railwayStation || "N/A"}
+BusStand    : ${city.transport?.busStand || "N/A"}
+Local transport: ${city.transport?.localTransport || "N/A"}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FESTIVALS IN ${travelMonth.toUpperCase()}
@@ -95,9 +94,19 @@ Start Date   : ${startDate}
 Duration     : ${days} days
 Group Size   : ${groupSize} people
 Total Budget : ₹${budget}
-Tourist Type : ${touristType || "domestic"}
+Tourist Type : ${touristType || "solo"}
 Interests    : ${interests?.join(", ") || "general"}
 Dietary      : ${dietary || "No preference"}
+HEALTH CONSIDERATIONS (critical — adjust itinerary accordingly):
+${healthConsiderations.includes("skin-sensitive") 
+  ? "- User has skin sensitivity. Avoid prolonged outdoor exposure between 11am–4pm. Prefer indoor attractions midday. Add UV/heat warnings to outdoor slots." 
+  : ""}
+${healthConsiderations.includes("mobility-limited") 
+  ? "- User has mobility issues. Avoid stairs, uneven terrain. Prefer flat walkways, ramp-accessible sites." 
+  : ""}
+${healthConsiderations.includes("respiratory") 
+  ? "- User has respiratory issues. Avoid dusty/polluted areas. Flag AQI warnings for the city." 
+  : ""}
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -117,7 +126,9 @@ OUTPUT RULES
 6. If a festival is happening, include it as a special slot on the most relevant day.
 7. Set each day's date sequentially starting from ${startDate}.
 8. Respect dietary preference (${dietary}) in all food suggestions.
-9. The vacation starts upon arrival in ${city.name}. Do not include travel from ${startCity} in these ${days} days.
+9.Give a real working url of place image for each places in slot.(can be from pintrest)
+10.For each slot, add place-specific warnings only (dress code, terrain, UV, timings).
+City-level safety (women safety, local behaviour, scams) is handled separately — do NOT repeat in slot warnings.
 
 COST RULES:
 1.dailyCostEstimate = transport costs + entry fees + food estimate for ${groupSize} people for that day.
@@ -149,6 +160,7 @@ Return this EXACT JSON shape. Every field is REQUIRED. No field may be null, und
           "placeName": "<Name from Section 3>",
           "placeId": "<FourSquare PlaceId from Section 3>",
           "rating": <number>,
+          "image":<url of place image>
           "duration": "<e.g. 1.5 hours>",
           "activity": "<One sentence: what the group does here>",
           "transport": {
@@ -166,7 +178,8 @@ Return this EXACT JSON shape. Every field is REQUIRED. No field may be null, und
               "dietFriendly": "<${dietary}>"
             }
           ],
-          "culturalNote": "<One sentence tip or cultural fact about this place>"
+          "culturalNote": "<One sentence tip or cultural fact about this place>",
+          "warnings":<"["High UV", "Uneven terrain", "Cover head inside mosque"]">
         }
       ],
       "hotelSuggestion": {
@@ -175,7 +188,7 @@ Return this EXACT JSON shape. Every field is REQUIRED. No field may be null, und
         "rating": <number>,
       }
     }
-  ]
+  ] 
 }
 `.trim();
 };
@@ -212,6 +225,7 @@ const buildGeminiSchema = (days) => ({
                 rating: { type: "number" },
                 image: { type: "string" },
                 duration: { type: "string" },
+                activity:{type:String},
                 transport: {
                   type: "object",
                   properties: {
@@ -232,6 +246,7 @@ const buildGeminiSchema = (days) => ({
                   },
                 },
                 culturalNote: { type: "string" },
+                warnings:[String],
               },
             },
           },

@@ -8,6 +8,10 @@ const slotSchema = new mongoose.Schema({
   rating: { type: Number }, // From Google Places API
   image: { type: String }, // URL or Photo Reference from Google
   duration: { type: String }, // e.g., "2 hours"
+  activity:{type:String},
+  warnings: [String],  // ["High UV", "Uneven terrain", "Cover head inside mosque"]
+  
+
   
   transport: {
     mode: { type: String }, // "auto", "metro", "cab", "walking"
@@ -38,7 +42,7 @@ const daySchema = new mongoose.Schema({
 // --- MAIN TRIPPLAN SCHEMA ---
 const tripPlanSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
-  // Optional start city
+  
   startCity: { type: String }, 
   // Linked to your static CityModel
   destinationCity: { 
@@ -53,20 +57,22 @@ const tripPlanSchema = new mongoose.Schema({
   // These will be calculated automatically in the controller
   days: { type: Number }, 
   travelMonth: { type: String },
-  budget: { type: Number, required: true },
+  budget: { type: String, required: true,enum
+    :["low","avg","luxury"],default:"avg"
+   },
   groupSize: { type: Number, default: 1 },
-  // Now taken from the User model (Logic handled in Controller)
+ 
   touristType: { type: String }, 
-  // Updated based on your uploaded image
+  
   interests: [{ 
     type: String, 
     enum: [
-      "Adventure", "Historical Landmarks", "Village Life", 
+      "Adventure", "Historical", "Village Life", 
       "Culture", "NightLife & Clubs", "Hidden Gems", 
       "Stargazing", "Food & Craft"
     ] 
   }],
-  dietary: { type: String, enum: ["veg", "non-veg", "halal"] },
+  dietary: { type: String, enum: ["veg", "non-veg", "both"] },
 
   // Conditional field
   arrivalJourney: {
@@ -77,11 +83,13 @@ const tripPlanSchema = new mongoose.Schema({
   },
   itinerary: [daySchema],
   totalEstimatedCost: { type: Number },
+
+  healthConsiderations: [{ 
+  type: String,
+  enum: ["skin-sensitive", "respiratory", "mobility-limited", "heart-condition", "diabetic", "none"]
+}],
  status: { type: String, enum: ["draft", "active", "completed"], default: "draft", },
 
-// --- TRACKING & LIVE UPDATES --- 
-
-//currentDay: { type: Number, default: 1 }, expenses: [{ category: String, amount: Number, note: String, date: { type: Date, default: Date.now } }], totalSpent: { type: Number, default: 0 },
 }, { timestamps: true });
 
 const tripPlanModel = mongoose.model("TripPlan", tripPlanSchema);

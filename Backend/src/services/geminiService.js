@@ -68,11 +68,11 @@ const generateItinerary = async (prompt, schema) => {
     const response = await result.response;
     const rawText = response.text(); 
     
-    console.log("Raw Gemini Output:", rawText);
+    console.log("Raw Gemini Output is created");
 
     // 5. Parse and return
-    // const cleanData = JSON.parse(rawText);
-    console.log("Clean data"+ cleanData)
+    const cleanData = JSON.parse(rawText);
+    console.log("Clean data stored in DB")
     return cleanData;
 
   } catch (err) {
