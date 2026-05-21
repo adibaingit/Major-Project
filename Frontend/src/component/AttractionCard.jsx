@@ -7,7 +7,7 @@ const AttractionCard = ({ place }) => {
       {/* IMAGE CONTAINER */}
       <div className="relative h-80 overflow-hidden">
         <img 
-          src={place.image || "/placeholder-monument.jpg"} 
+          src={place.image || "https://images.unsplash.com/photo-1488646953014-85cb44e25828"} 
           alt={place.title}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         />

@@ -3,11 +3,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Plane, Train, Bus, Info, Phone, Calendar, AlertTriangle, ChevronRight,Sparkles } from 'lucide-react';
 import axios from 'axios';
 import AttractionCard from '../component/AttractionCard';
+import SafetySummary from '../component/SafetySummary';
+import ReactPlayer from 'react-player';
+import { X, Play } from 'lucide-react';
 
 const CityDetails = () => {
   const { cityName } = useParams();
   const navigate = useNavigate();
   const [city, setCity] = useState(null);
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -54,7 +59,7 @@ const CityDetails = () => {
       </section>
 
       {/* ================= ABOUT SECTION (Ref: image_9028f6.png) ================= */}
-      <section className="max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <section className="max-w-7xl mx-auto px-6 pt-20 pb-10 grid grid-cols-1 lg:grid-cols-3 gap-12">
         
         {/* LEFT: Description & Famous For */}
         <div className="lg:col-span-2">
@@ -76,6 +81,52 @@ const CityDetails = () => {
                 ))}
              </div>
           </div>
+          {/* Video Tour Action Button */}
+      {city.videoTour && (
+        <div className="mt-10">
+          <button
+            onClick={() => setIsVideoOpen(true)}
+            className="flex items-center gap-3 bg-primary text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-secondary hover:text-primary transition-all duration-300 shadow-md group"
+          >
+            <span className="bg-white/20 p-1.5 rounded-lg group-hover:bg-primary/10 transition-colors">
+              <Play size={14} className="fill-current" />
+            </span>
+            Watch Video Tour
+          </button>
+        </div>
+      )}
+      {/* Video Player Modal Overlay using ReactPlayer */}
+      {isVideoOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden aspect-video shadow-2xl border border-white/10">
+            
+            {/* Close Button */}
+            <button
+              onClick={() => setIsVideoOpen(false)}
+              className="absolute top-4 right-4 z-50 bg-black/60 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            {/* ReactPlayer Component */}
+            <ReactPlayer
+              url={city.videoTour}
+              className="absolute top-0 left-0 z-10"
+              width="100%"
+              height="100%"
+              controls={true} // Shows native YouTube pause/play/volume bars
+              playing={isReady}  // Autoplays video immediately upon modal mount
+              muted={!isReady}   // Start muted to avoid sudden audio
+              onReady={() => setIsReady(true)}
+              config={{
+                youtube: {
+                  playerVars: { rel: 0 } // Prevents showing unrelated channels at the end
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
         </div>
 
         {/* RIGHT: Utility Sidebar Cards */}
@@ -116,23 +167,14 @@ const CityDetails = () => {
                </div>
             </div>
           </div>
-
-          {/* Emergency Numbers */}
-          <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-            <h4 className="text-secondary text-xs font-bold uppercase tracking-widest mb-6">Emergency Details</h4>
-            <div className="space-y-3">
-               <div className="flex justify-between items-center text-sm font-medium">
-                  <span className="text-gray-400">Police</span>
-                  <span className="text-primary">{city.emergencyNumbers.police}</span>
-               </div>
-               <div className="flex justify-between items-center text-sm font-medium">
-                  <span className="text-gray-400">Ambulance</span>
-                  <span className="text-primary">{city.emergencyNumbers.ambulance}</span>
-               </div>
-            </div>
-          </div>
         </div>
       </section>
+
+      {/* Safety Summary */}
+          <div className="bg-white p-8 mx-40 rounded-3xl shadow-sm border border-gray-100">
+            <h4 className="text-secondary text-xs font-bold uppercase tracking-widest mb-6">Safety Summary</h4>
+            <SafetySummary city={city} />
+          </div>
 
       {/* ================= PLACES TO VISIT SECTION ================= */}
       <section className="max-w-7xl mx-auto px-6 py-12 border-t border-gray-100">

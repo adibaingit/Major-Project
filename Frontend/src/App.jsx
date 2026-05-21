@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import CityDetails from "./pages/CityDetails";
 import Itinerary from "./pages/Itinerary";
 import MyTrips from "./pages/MyTrips";
+import Footer from "./component/Footer";
 import { useState } from "react";
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
           onSwitchToLogin={() => { setShowSignup(false); setShowLogin(true); }}
         />
       )}
+      <Footer />
     </BrowserRouter>
   );
 }

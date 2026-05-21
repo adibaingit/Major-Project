@@ -18,7 +18,7 @@ const HeaderSection = ({ trip, city, onExport }) => {
             {city.name}, {city.state}
           </p>
           <h1 className="text-4xl font-balthazar text-primary">
-            {trip.title || `Dil se ${city.name}`} — {trip.days} days
+            {trip.title || `${city.name}`} — {trip.days} days
           </h1>
         </div>
         

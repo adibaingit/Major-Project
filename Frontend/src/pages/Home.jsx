@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Heart, Banknote, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
@@ -29,7 +29,7 @@ const Home = () => {
       <style>{animations}</style>
 
       {/* Hero Section */}
-      <section className="relative w-full h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative w-full h-screen flex items-center justify-center overflow-hidden shadow-lg">
         
         {/* Background Image - Positioned to fill screen behind Navbar */}
         <div className="absolute top-15">
@@ -76,16 +76,85 @@ const Home = () => {
 
       {/* Feature Section (Matches LitLens layout) */}
       <section className="bg-white py-24 px-6 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="font-balthazar text-primary text-4xl mb-8 tracking-wide">
-            Intelligence Meets Exploration
-          </h2>
-          <div className="w-20 h-1 bg-secondary mx-auto mb-8"></div>
-          <p className="font-outfit text-primary/70 text-lg leading-relaxed font-light">
-            We combine real-time local data with advanced logical reasoning to build a cohesive, 
-            actionable travel blueprint. Experience a journey designed specifically around your 
-            unique interests and budget.
+      {/* Header Context */}
+      <div className="max-w-4xl mx-auto text-center mb-16">
+        <h2 className="font-balthazar text-primary text-4xl mb-6 tracking-wide">
+          Because Great Journeys Should Feel Easy
+        </h2>
+        <div className="w-20 h-1 bg-secondary mx-auto mb-6"></div>
+        <p className="font-outfit text-primary/40 text-sm tracking-widest uppercase font-semibold">
+          No Chaos. No Guesswork. Just Good Journeys.
+        </p>
+      </div>
+
+      {/* Feature Cards Grid Container */}
+      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 items-stretch px-4">
+        
+        {/* Card 1: Dream It, Tell Us. */}
+        <div className="flex flex-col items-center text-center p-8 rounded-3xl bg-transparent border border-transparent transition-all duration-300">
+          <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mb-6 text-amber-500 shrink-0">
+            <Sparkles size={24} className="fill-current" />
+          </div>
+          <h3 className="font-balthazar text-primary text-xl font-bold mb-4">
+            Dream It, Tell Us.
+          </h3>
+          <p className="font-outfit text-primary/70 text-sm leading-relaxed font-light">
+            Tell us your vibe — romantic, offbeat, solo, or group. SafarAI turns it into a real plan instantly.
           </p>
+        </div>
+
+        {/* Card 2: Smart + Soulful Itineraries (The Highlighted/Lifted Card) */}
+        <div className="flex flex-col items-center text-center p-8 rounded-3xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100/50 transition-all duration-300 transform -translate-y-2">
+          <div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center mb-6 text-rose-500 shrink-0">
+            <Heart size={24} />
+          </div>
+          <h3 className="font-balthazar text-primary text-xl font-bold mb-4">
+            Smart + Soulful Itineraries.
+          </h3>
+          <p className="font-outfit text-primary/70 text-sm leading-relaxed font-light">
+            Built by AI + local experts, you get a plan that's logical, realistic, and love-filled.
+          </p>
+        </div>
+
+        {/* Card 3: Transparent Pricing, Always. */}
+        <div className="flex flex-col items-center text-center p-8 rounded-3xl bg-transparent border border-transparent transition-all duration-300">
+          <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mb-6 text-emerald-500 shrink-0">
+            <Banknote size={24} />
+          </div>
+          <h3 className="font-balthazar text-primary text-xl font-bold mb-4">
+            Transparent Pricing, Always.
+          </h3>
+          <p className="font-outfit text-primary/70 text-sm leading-relaxed font-light">
+            No hidden charges, commissions, or shady operators. You pay for exactly what you choose.
+          </p>
+        </div>
+
+        {/* Card 4: SafarAI All-Cover Shield */}
+        <div className="flex flex-col items-center text-center p-8 rounded-3xl bg-transparent border border-transparent transition-all duration-300">
+          <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mb-6 text-purple-600 shrink-0">
+            <ShieldCheck size={24} />
+          </div>
+          <h3 className="font-balthazar text-primary text-xl font-bold mb-4">
+            SafarAI All-Cover Shield.
+          </h3>
+          <p className="font-outfit text-primary/70 text-sm leading-relaxed font-light">
+            Travel safely with reliable help networks, verified local on-ground contacts, and safety advice.
+          </p>
+        </div>
+
+      </div>
+    </section>
+      {/* Bottom Showcase Image Section */}
+      <section className="w-full bg-white pb-24 px-18 md:px-12 relative z-10">
+        <h2 className="font-balthazar text-primary text-4xl mb-8 tracking-wide">
+          Your Journey, Our Expertise
+        </h2>
+        <div className="max-w-6xl mx-24 rounded-3xl overflow-hidden shadow-xl border border-gray-100">
+          <img 
+            src="/trip.png" 
+            alt="SafarAI Exploration Showcase" 
+            className="w-full h-auto object-cover max-h-full"
+          />
         </div>
       </section>
     </div>
