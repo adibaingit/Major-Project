@@ -51,7 +51,7 @@ const CityDetails = () => {
           </p>
           <button 
             onClick={() => navigate('/plan', { state: { destination: city.name } })}
-            className="flex items-center gap-3 bg-secondary text-primary px-8 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-white hover:scale-105 transition-all shadow-2xl"
+            className="flex items-center gap-3 bg-secondary text-primary px-8 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-white hover:cursor-pointer transition-all shadow-2xl"
           >
             <Sparkles size={18} /> Create My Trip
           </button>
