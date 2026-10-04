@@ -1,4 +1,4 @@
-// src/utils/foursquareCategories.js
+// src/utils/fourSquareCategories.js
 const interestToCategoryId = {
   "Adventure": "19000", // Land Marks & Outdoors
   "Historical Landmarks": "16026", // Monuments / Landmarks

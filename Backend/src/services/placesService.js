@@ -1,6 +1,6 @@
 // src/services/placesService.js
 const axios = require('axios');
-const { getCategoryString } = require('../utils/foursquareCategories');
+const { getCategoryString } = require('../utils/fourSquareCategories');
 
 const fetchFoursquarePlaces = async (coordinates, interests, limit,query) => {
   const { lat, lng } = coordinates;
